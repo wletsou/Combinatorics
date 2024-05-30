@@ -1,0 +1,177 @@
+---
+title: "Words with repeats"
+author: "William Letsou"
+date: "2024-05-29"
+output:
+  bookdown::html_document2: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+A common problem in introductory probability and statistics is the determination of the number of number of $k$-combinations of a set of $n$ elements having up to $n$ of the same element, a result given succinctly by the formula
+\begin{equation}
+\binom{n+k-1}{k}
+\end{equation}Yet this formula does not differentiate combinations by the number $x$ of repeats in the selection.&nbsp; In this paper we find a recursive formula for the distribution of the number $x$ of repeats in words of a fixed length on a defined alphabet.
+
+# Preliminaries
+
+We will define a *word* as an ordered selection of $n$ *letters* in the set $\left\{1,\ldots,k\right\}$, from which a single letter may be selected more than once.&nbsp; It is a simple matter to count the number of words having at least two letters the same through the formula
+\begin{equation}
+k^n-\prod_{j=0}^{n-1}\left(n-j\right),
+\end{equation}which is $k^n$ whenever there are more letters in the word than in the alphabet. 
+
+Similarly, the number of words using at most $j$ of $k$ letters is got from the inclusion-exclusion sum
+\begin{equation}
+\sum_{i=0}^{j-1}\left(-1\right)^{i}\binom{k}{j-i}\left(j-i\right)^n,
+\end{equation}so that the number of words using exactly $j$ letters is the difference of the numbers using at most $j+1$ and at most $j$.
+
+# Forward recurrence
+
+We will now derive the complementary result, viz., the number of words having a set number of repeats of any one letter.&nbsp; Let $f^n_k\left(x\right)$ denote the number of $n$-letter words on a $k$-letter alphabet having at least $x$ letters the same.&nbsp; Words with $x$ repeats of a single letter can be divided into those in which $1$ is the repeated letter, and those in which it is not.&nbsp; The number of words in which $1$ is repeated at least $x$ times is the complement of the number of words in which it is used fewer than $x$ times:
+\begin{equation}
+k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j},
+(#eq:1words)
+\end{equation}which equation is derived by specifying the positions of up to $x-1$ $1$'s and counting all the words in which the remaining letters are filled by the letters $\left\{2,\ldots,k\right\}$.&nbsp; There remains the words which have no more than $x-1$ $1$'s, but which have $x$ repeats of another letter.&nbsp; This quantity can be got recursively by
+\begin{equation}
+\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+(#eq:non1words)
+\end{equation}in which the spaces not taken up by $1$'s are filled by letters in $\left\{2,\ldots,k\right\}$ in such a way that one of them should be repeated $x$ times.&nbsp; The sum of \@ref(eq:1words) and \@ref(eq:non1words) gives the result
+\begin{equation}
+f_k^n\left(x\right)=\left(k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+(#eq:recursive)
+\end{equation}subject to the initial condition $f_1^k\left(x\right)=1, \forall x\leq n$ that there is only one word on an alphabet of a single letter, and that $f_k^n\left(x\right)=0, \forall x>n$ when the number of repeats exceeds the number of letters in the word.
+
+Code implementing Eq. \@ref(eq:recursive) is given below:
+
+```{r}
+f <- function(n,k,x) { # number of n-letter words on k-letters with at least k repeats
+  if (x <= n) {
+    if (k > 1) { # words with "1" that have at least x 1's
+      output <- (k ^ n - sum(choose(n,0:(x - 1)) * (k - 1) ^ (n - 0:(x - 1))))
+      for (j in 0:(x - 1)) { # words without 1 that have at least x of another letter
+        output <- output + choose(n,j) * f(n - j,k - 1,x)
+      }
+      return(output)
+    } else if (k == 1) { # if only one letter, only one word possible
+      output = 1
+      return(output)
+    } else if (k < 1) { # if zero letters, no words possible
+      output = 0
+      return(output)
+    }
+  } else if (x > n) { # can't have more than n duplicates
+    output = 0
+    return(output)
+  }
+}
+```
+
+Using this function, we can generate a series of tables of $x$ vs. $k$ for increasing values of $n$ to visualize the number of $n$-letter words on $k$-letter alphabets having at least $x=1,\ldots,n$ repeats of a single letter.&nbsp; We observe that when $n=x$, the number of words is just the number of letters $k$ in the alphabet.&nbsp; When length $n$ of the word exceeds $k\left(x-1\right)$, all $k^n$ words contain at least $x$ repeats of some letter.
+
+```{r}
+options(width = 999)
+ul <- 6
+for (n in 1:ul) {
+  cat(sprintf("n = %d\n",n))
+  print(do.call(rbind,lapply(seq(1,ul),function(X) lapply(seq(1,ul), function(Y) f(n,Y,X)))))
+  cat("\n")
+  }
+```
+
+# Reverse recurrence
+
+Let $g^n_k\left(x\right)$ denote the number of $n$-letter words on a $k$-letter alphabet having at most $x$ letters the same.&nbsp; Words with $x$ repeats of a single letter can be divided into those in which $1$ is the repeated not more than $x$ times, and those in which it is.&nbsp; The number of words in which $1$ is repeated no more than $x$ times is the complement of the number of words in which it is used at least $x$ times:
+\begin{equation}
+k^n-\sum_{j=x+1}^{n}\binom{n}{j}\left(k-1\right)^{n-j},
+(#eq:1wordsrev)
+\end{equation}which equation is derived by specifying the positions of more than $x$ $1$'s, and counting all the words in which the remaining letters are filled by the letters $\left\{2,\ldots,k\right\}$.&nbsp; There remains the words which have at least $x$ $1$'s, but which no more than $x$ repeats of another letter.&nbsp; This quantity can be got recursively by
+\begin{equation}
+\sum_{j=x+1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+(#eq:non1wordsrev)
+\end{equation}in which the spaces not taken up by $1$'s are filled by letters in $\left\{2,\ldots,k\right\}$ in such a way that one of them should be repeated no more than $x$ times.&nbsp; The sum of \@ref(eq:1wordsrev) and \@ref(eq:non1wordsrev) gives the result
+\begin{equation}
+g_k^n\left(x\right)=\left(k^n-\sum_{j=x-1}^{n}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=x-1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+(#eq:recursiverev)
+\end{equation}subject to the initial condition $g_1^k\left(x\right)=1, \forall x\geq n$ and $g_1^k\left(x\right)=1, \forall x< n$ that there is only one word on an alphabet of a single letter, except when $n$ copies of a sinlge letter exceed the threshold $x$; that $g_k^n\left(x\right)=0, \forall x>n$ when the number of repeats exceeds the number of letters in the word; and $g_k^0\left(x\right)=1$ in the case that the single empty word contains each of the $k$ letters no more than $x>0$ times.
+
+Code implementing Eq. \@ref(eq:recursiverev) is given below:
+
+```{r}
+g <- function(n,k,x) { # number of n-letter words on k-letters with at most x repeats
+  if (n < 1) { # if word has zero letters, the single 'empty' word uses each letter fewer than x times
+    output <- 1
+    return(output)
+  } else if (n > 0 & x <= n) {
+    if (k > 1) { # words with "1" that have at most x 1's
+      output <- (k ^ n - sum(choose(n,(x + 1):n) * (k - 1) ^ (n - (x + 1):n)))
+      for (j in (x + 1):n) { # words with more than x 1's that have at most x of another letter
+        output <- output + choose(n,j) * g(n - j,k - 1,x)
+      }
+      return(output)
+    } else if (k > 1) {
+      output <- k ^ n
+      return(output)
+    } else if (k == 1 & x >= n) { # if only one letter in alphabet, only one word possible...
+      output = 1
+      return(output)
+    } else if (k == 1 & x < n) { # as long as it is possible to spell the n-letter word without more than x copies of the single letter
+      output = 0
+      return(output)
+    } else if (k < 1) { # if zero letters in alphabet, no words possible
+      output = 0
+      return(output)
+    }
+  } else if (x > n) { # no words have letters with more than n duplicates, so all have less
+    output = k ^ n
+    return(output)
+  }
+}
+```
+
+Using this function, we can generate a series of tables of $x$ vs. $k$ for increasing values of $n$; $x=0$ is included as the first row of each table, because words may omit a letter.&nbsp; We observe that while most of the table is $k^n$, situations arise when it is not possible to spell the $n$-letter word with only $x$ copies of each letter (e.g., the word $1122$ cannot be spelled with only $x=1$ copy of each letter of the alphabet $\left\{1,2\right\}$.
+
+```{r}
+options(width = 999)
+ul <- 6
+for (n in 1:ul) {
+  cat(sprintf("n = %d\n",n))
+  print(do.call(rbind,lapply(seq(0,ul),function(X) lapply(seq(1,ul), function(Y) g(n,Y,X)))))
+  cat("\n")
+  }
+```
+
+
+# Verification
+
+The function below verifies the recurrence \@ref(eq:recursive) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding the maximum number of times *any* letter of the word occurs.  The cumulative sum over the distribution of the maximum number $x$ of occurrences gives the number of words having at least one letter appearing $x$ or more times.
+
+```{r}
+f <- function(n,k) {
+  rev(cumsum(rev(tabulate(unlist(lapply(lapply(as.list(as.data.frame(t(expand.grid(rep(list(1:k),n))))),function(X) tabulate(X,nbins = k)),max)),nbins = n))))
+}
+```
+
+```{r}
+options(width = 999)
+ul <- 6
+print(lapply(lapply(seq(1,ul),function(X) lapply(seq(1,ul), function(Y) f(X,Y))),function(Z) do.call(cbind,Z)))
+```
+
+The function below verifies the recurrence \@ref(eq:recursiverev) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding $n+1$ less the minimum number of times any letter of the word occurs.&nbsp; The cumulative sum over this value gives the number of words having at most $1,\ldots,n$ copies of some letter.
+
+```{r}
+g <- function(n,k) {
+  (cumsum(rev(tabulate(unlist(lapply(lapply(as.list(as.data.frame(t(expand.grid(rep(list(1:k),n))))),function(X) tabulate(X,nbins = k)),function(Z) n - min(Z) + 1)),nbins = n + 1))))
+}
+```
+
+```{r}
+options(width = 999)
+ul <- 6
+print(lapply(lapply(seq(1,ul),function(X) lapply(seq(1,ul), function(Y) g(X,Y))),function(Z) do.call(cbind,Z)))
+```
+
