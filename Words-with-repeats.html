@@ -11,7 +11,7 @@
 
 <meta name="author" content="William Letsou" />
 
-<meta name="date" content="2024-05-29" />
+<meta name="date" content="2024-05-31" />
 
 <title>Words with repeats</title>
 
@@ -339,7 +339,7 @@ display: none;
 
 <h1 class="title toc-ignore">Words with repeats</h1>
 <h4 class="author">William Letsou</h4>
-<h4 class="date">2024-05-29</h4>
+<h4 class="date">2024-05-31</h4>
 
 </div>
 
@@ -355,7 +355,7 @@ display: none;
 <h1><span class="header-section-number">2</span> Preliminaries</h1>
 <p>We will define a <em>word</em> as an ordered selection of <span class="math inline">\(n\)</span> <em>letters</em> in the set <span class="math inline">\(\left\{1,\ldots,k\right\}\)</span>, from which a single letter may be selected more than once.  It is a simple matter to count the number of words having at least two letters the same through the formula
 <span class="math display">\[\begin{equation}
-k^n-\prod_{j=0}^{n-1}\left(n-j\right),
+k^n-\prod_{i=0}^{n-1}\left(n-i\right),
 \end{equation}\]</span>which is <span class="math inline">\(k^n\)</span> whenever there are more letters in the word than in the alphabet.</p>
 <p>Similarly, the number of words using at most <span class="math inline">\(j\)</span> of <span class="math inline">\(k\)</span> letters is got from the inclusion-exclusion sum
 <span class="math display">\[\begin{equation}
@@ -366,15 +366,15 @@ k^n-\prod_{j=0}^{n-1}\left(n-j\right),
 <h1><span class="header-section-number">3</span> Forward recurrence</h1>
 <p>We will now derive the complementary result, viz., the number of words having a set number of repeats of any one letter.  Let <span class="math inline">\(f^n_k\left(x\right)\)</span> denote the number of <span class="math inline">\(n\)</span>-letter words on a <span class="math inline">\(k\)</span>-letter alphabet having at least <span class="math inline">\(x\)</span> letters the same.  Words with <span class="math inline">\(x\)</span> repeats of a single letter can be divided into those in which <span class="math inline">\(1\)</span> is the repeated letter, and those in which it is not.  The number of words in which <span class="math inline">\(1\)</span> is repeated at least <span class="math inline">\(x\)</span> times is the complement of the number of words in which it is used fewer than <span class="math inline">\(x\)</span> times:
 <span class="math display" id="eq:1words">\[\begin{equation}
-k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j},
+k^n-\sum_{i=0}^{x-1}\binom{n}{i}\left(k-1\right)^{n-i},
 \tag{3.1}
 \end{equation}\]</span>which equation is derived by specifying the positions of up to <span class="math inline">\(x-1\)</span> <span class="math inline">\(1\)</span>’s and counting all the words in which the remaining letters are filled by the letters <span class="math inline">\(\left\{2,\ldots,k\right\}\)</span>.  There remains the words which have no more than <span class="math inline">\(x-1\)</span> <span class="math inline">\(1\)</span>’s, but which have <span class="math inline">\(x\)</span> repeats of another letter.  This quantity can be got recursively by
 <span class="math display" id="eq:non1words">\[\begin{equation}
-\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+\sum_{i=0}^{x-1}\binom{n}{i}f^{n-i}_{k-1}\left(x\right),
 \tag{3.2}
 \end{equation}\]</span>in which the spaces not taken up by <span class="math inline">\(1\)</span>’s are filled by letters in <span class="math inline">\(\left\{2,\ldots,k\right\}\)</span> in such a way that one of them should be repeated <span class="math inline">\(x\)</span> times.  The sum of <a href="#eq:1words">(3.1)</a> and <a href="#eq:non1words">(3.2)</a> gives the result
 <span class="math display" id="eq:recursive">\[\begin{equation}
-f_k^n\left(x\right)=\left(k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+f_k^n\left(x\right)=\left(k^n-\sum_{i=0}^{x-1}\binom{n}{i}\left(k-1\right)^{n-i}\right)+\sum_{i=0}^{x-1}\binom{n}{i}f^{n-i}_{k-1}\left(x\right),
 \tag{3.3}
 \end{equation}\]</span>subject to the initial condition <span class="math inline">\(f_1^k\left(x\right)=1, \forall x\leq n\)</span> that there is only one word on an alphabet of a single letter, and that <span class="math inline">\(f_k^n\left(x\right)=0, \forall x&gt;n\)</span> when the number of repeats exceeds the number of letters in the word.</p>
 <p>Code implementing Eq. <a href="#eq:recursive">(3.3)</a> is given below:</p>
@@ -464,15 +464,15 @@ for (n in 1:ul) {
 <h1><span class="header-section-number">4</span> Reverse recurrence</h1>
 <p>Let <span class="math inline">\(g^n_k\left(x\right)\)</span> denote the number of <span class="math inline">\(n\)</span>-letter words on a <span class="math inline">\(k\)</span>-letter alphabet having at most <span class="math inline">\(x\)</span> letters the same.  Words with <span class="math inline">\(x\)</span> repeats of a single letter can be divided into those in which <span class="math inline">\(1\)</span> is the repeated not more than <span class="math inline">\(x\)</span> times, and those in which it is.  The number of words in which <span class="math inline">\(1\)</span> is repeated no more than <span class="math inline">\(x\)</span> times is the complement of the number of words in which it is used at least <span class="math inline">\(x\)</span> times:
 <span class="math display" id="eq:1wordsrev">\[\begin{equation}
-k^n-\sum_{j=x+1}^{n}\binom{n}{j}\left(k-1\right)^{n-j},
+k^n-\sum_{i=x+1}^{n}\binom{n}{i}\left(k-1\right)^{n-i},
 \tag{4.1}
 \end{equation}\]</span>which equation is derived by specifying the positions of more than <span class="math inline">\(x\)</span> <span class="math inline">\(1\)</span>’s, and counting all the words in which the remaining letters are filled by the letters <span class="math inline">\(\left\{2,\ldots,k\right\}\)</span>.  There remains the words which have at least <span class="math inline">\(x\)</span> <span class="math inline">\(1\)</span>’s, but which no more than <span class="math inline">\(x\)</span> repeats of another letter.  This quantity can be got recursively by
 <span class="math display" id="eq:non1wordsrev">\[\begin{equation}
-\sum_{j=x+1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+\sum_{i=x+1}^{n}\binom{n}{i}g^{n-i}_{k-1}\left(x\right),
 \tag{4.2}
 \end{equation}\]</span>in which the spaces not taken up by <span class="math inline">\(1\)</span>’s are filled by letters in <span class="math inline">\(\left\{2,\ldots,k\right\}\)</span> in such a way that one of them should be repeated no more than <span class="math inline">\(x\)</span> times.  The sum of <a href="#eq:1wordsrev">(4.1)</a> and <a href="#eq:non1wordsrev">(4.2)</a> gives the result
 <span class="math display" id="eq:recursiverev">\[\begin{equation}
-g_k^n\left(x\right)=\left(k^n-\sum_{j=x-1}^{n}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=x-1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+g_k^n\left(x\right)=\left(k^n-\sum_{i=x-1}^{n}\binom{n}{i}\left(k-1\right)^{n-i}\right)+\sum_{i=x-1}^{n}\binom{n}{i}g^{n-i}_{k-1}\left(x\right),
 \tag{4.3}
 \end{equation}\]</span>subject to the initial condition <span class="math inline">\(g_1^k\left(x\right)=1, \forall x\geq n\)</span> and <span class="math inline">\(g_1^k\left(x\right)=1, \forall x&lt; n\)</span> that there is only one word on an alphabet of a single letter, except when <span class="math inline">\(n\)</span> copies of a sinlge letter exceed the threshold <span class="math inline">\(x\)</span>; that <span class="math inline">\(g_k^n\left(x\right)=0, \forall x&gt;n\)</span> when the number of repeats exceeds the number of letters in the word; and <span class="math inline">\(g_k^0\left(x\right)=1\)</span> in the case that the single empty word contains each of the <span class="math inline">\(k\)</span> letters no more than <span class="math inline">\(x&gt;0\)</span> times.</p>
 <p>Code implementing Eq. <a href="#eq:recursiverev">(4.3)</a> is given below:</p>
@@ -575,7 +575,7 @@ for (n in 1:ul) {
 </div>
 <div id="verification" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Verification</h1>
-<p>The function below verifies the recurrence <a href="#eq:recursive">(3.3)</a> by formulating all <span class="math inline">\(n\)</span>-letter words of the set <span class="math inline">\(\left\{1,\ldots,k\right\}\)</span>, and finding the maximum number of times <em>any</em> letter of the word occurs. The cumulative sum over the distribution of the maximum number <span class="math inline">\(x\)</span> of occurrences gives the number of words having at least one letter appearing <span class="math inline">\(x\)</span> or more times.</p>
+<p>The function below verifies the recurrence <a href="#eq:recursive">(3.3)</a> by formulating all <span class="math inline">\(n\)</span>-letter words of the set <span class="math inline">\(\left\{1,\ldots,k\right\}\)</span>, and finding the maximum number of times <em>any</em> letter of the word occurs.  The cumulative sum over the distribution of the maximum number <span class="math inline">\(x\)</span> of occurrences gives the number of words having at least one letter appearing <span class="math inline">\(x\)</span> or more times.</p>
 <pre class="r"><code>f &lt;- function(n,k) {
   rev(cumsum(rev(tabulate(unlist(lapply(lapply(as.list(as.data.frame(t(expand.grid(rep(list(1:k),n))))),function(X) tabulate(X,nbins = k)),max)),nbins = n))))
 }</code></pre>
@@ -620,7 +620,7 @@ print(lapply(lapply(seq(1,ul),function(X) lapply(seq(1,ul), function(Y) f(X,Y)))
 ## [4,]    1   44  219  616  1325  2436
 ## [5,]    1   14   39   76   125   186
 ## [6,]    1    2    3    4     5     6</code></pre>
-<p>The function below verifies the recurrence <a href="#eq:recursiverev">(4.3)</a> by formulating all <span class="math inline">\(n\)</span>-letter words of the set <span class="math inline">\(\left\{1,\ldots,k\right\}\)</span>, and finding <span class="math inline">\(n+1\)</span> less the minimum number of times any letter of the word occurs.  The cumulative sum over this value gives the number of words having at most <span class="math inline">\(1,\ldots,n\)</span> copies of some letter.</p>
+<p>The function below verifies the recurrence <a href="#eq:recursiverev">(4.3)</a> by formulating all <span class="math inline">\(n\)</span>-letter words of the set <span class="math inline">\(\left\{1,\ldots,k\right\}\)</span>, and finding <span class="math inline">\(n+1\)</span> less the minimum number of times any letter of the word occurs.  The cumulative sum over this value gives the number of words having at most <span class="math inline">\(1,\ldots,n\)</span> copies of some letter.  N.b., the rows of each table start at <span class="math inline">\(x=0\)</span>.</p>
 <pre class="r"><code>g &lt;- function(n,k) {
   (cumsum(rev(tabulate(unlist(lapply(lapply(as.list(as.data.frame(t(expand.grid(rep(list(1:k),n))))),function(X) tabulate(X,nbins = k)),function(Z) n - min(Z) + 1)),nbins = n + 1))))
 }</code></pre>

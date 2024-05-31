@@ -1,7 +1,7 @@
 ---
 title: "Words with repeats"
 author: "William Letsou"
-date: "2024-05-29"
+date: "2024-05-31"
 output:
   bookdown::html_document2: default
 ---
@@ -21,7 +21,7 @@ A common problem in introductory probability and statistics is the determination
 
 We will define a *word* as an ordered selection of $n$ *letters* in the set $\left\{1,\ldots,k\right\}$, from which a single letter may be selected more than once.&nbsp; It is a simple matter to count the number of words having at least two letters the same through the formula
 \begin{equation}
-k^n-\prod_{j=0}^{n-1}\left(n-j\right),
+k^n-\prod_{i=0}^{n-1}\left(n-i\right),
 \end{equation}which is $k^n$ whenever there are more letters in the word than in the alphabet. 
 
 Similarly, the number of words using at most $j$ of $k$ letters is got from the inclusion-exclusion sum
@@ -33,15 +33,15 @@ Similarly, the number of words using at most $j$ of $k$ letters is got from the 
 
 We will now derive the complementary result, viz., the number of words having a set number of repeats of any one letter.&nbsp; Let $f^n_k\left(x\right)$ denote the number of $n$-letter words on a $k$-letter alphabet having at least $x$ letters the same.&nbsp; Words with $x$ repeats of a single letter can be divided into those in which $1$ is the repeated letter, and those in which it is not.&nbsp; The number of words in which $1$ is repeated at least $x$ times is the complement of the number of words in which it is used fewer than $x$ times:
 \begin{equation}
-k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j},
+k^n-\sum_{i=0}^{x-1}\binom{n}{i}\left(k-1\right)^{n-i},
 (#eq:1words)
 \end{equation}which equation is derived by specifying the positions of up to $x-1$ $1$'s and counting all the words in which the remaining letters are filled by the letters $\left\{2,\ldots,k\right\}$.&nbsp; There remains the words which have no more than $x-1$ $1$'s, but which have $x$ repeats of another letter.&nbsp; This quantity can be got recursively by
 \begin{equation}
-\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+\sum_{i=0}^{x-1}\binom{n}{i}f^{n-i}_{k-1}\left(x\right),
 (#eq:non1words)
 \end{equation}in which the spaces not taken up by $1$'s are filled by letters in $\left\{2,\ldots,k\right\}$ in such a way that one of them should be repeated $x$ times.&nbsp; The sum of \@ref(eq:1words) and \@ref(eq:non1words) gives the result
 \begin{equation}
-f_k^n\left(x\right)=\left(k^n-\sum_{j=0}^{x-1}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=0}^{x-1}\binom{n}{j}f^{n-j}_{k-1}\left(x\right),
+f_k^n\left(x\right)=\left(k^n-\sum_{i=0}^{x-1}\binom{n}{i}\left(k-1\right)^{n-i}\right)+\sum_{i=0}^{x-1}\binom{n}{i}f^{n-i}_{k-1}\left(x\right),
 (#eq:recursive)
 \end{equation}subject to the initial condition $f_1^k\left(x\right)=1, \forall x\leq n$ that there is only one word on an alphabet of a single letter, and that $f_k^n\left(x\right)=0, \forall x>n$ when the number of repeats exceeds the number of letters in the word.
 
@@ -86,15 +86,15 @@ for (n in 1:ul) {
 
 Let $g^n_k\left(x\right)$ denote the number of $n$-letter words on a $k$-letter alphabet having at most $x$ letters the same.&nbsp; Words with $x$ repeats of a single letter can be divided into those in which $1$ is the repeated not more than $x$ times, and those in which it is.&nbsp; The number of words in which $1$ is repeated no more than $x$ times is the complement of the number of words in which it is used at least $x$ times:
 \begin{equation}
-k^n-\sum_{j=x+1}^{n}\binom{n}{j}\left(k-1\right)^{n-j},
+k^n-\sum_{i=x+1}^{n}\binom{n}{i}\left(k-1\right)^{n-i},
 (#eq:1wordsrev)
 \end{equation}which equation is derived by specifying the positions of more than $x$ $1$'s, and counting all the words in which the remaining letters are filled by the letters $\left\{2,\ldots,k\right\}$.&nbsp; There remains the words which have at least $x$ $1$'s, but which no more than $x$ repeats of another letter.&nbsp; This quantity can be got recursively by
 \begin{equation}
-\sum_{j=x+1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+\sum_{i=x+1}^{n}\binom{n}{i}g^{n-i}_{k-1}\left(x\right),
 (#eq:non1wordsrev)
 \end{equation}in which the spaces not taken up by $1$'s are filled by letters in $\left\{2,\ldots,k\right\}$ in such a way that one of them should be repeated no more than $x$ times.&nbsp; The sum of \@ref(eq:1wordsrev) and \@ref(eq:non1wordsrev) gives the result
 \begin{equation}
-g_k^n\left(x\right)=\left(k^n-\sum_{j=x-1}^{n}\binom{n}{j}\left(k-1\right)^{n-j}\right)+\sum_{j=x-1}^{n}\binom{n}{j}g^{n-j}_{k-1}\left(x\right),
+g_k^n\left(x\right)=\left(k^n-\sum_{i=x-1}^{n}\binom{n}{i}\left(k-1\right)^{n-i}\right)+\sum_{i=x-1}^{n}\binom{n}{i}g^{n-i}_{k-1}\left(x\right),
 (#eq:recursiverev)
 \end{equation}subject to the initial condition $g_1^k\left(x\right)=1, \forall x\geq n$ and $g_1^k\left(x\right)=1, \forall x< n$ that there is only one word on an alphabet of a single letter, except when $n$ copies of a sinlge letter exceed the threshold $x$; that $g_k^n\left(x\right)=0, \forall x>n$ when the number of repeats exceeds the number of letters in the word; and $g_k^0\left(x\right)=1$ in the case that the single empty word contains each of the $k$ letters no more than $x>0$ times.
 
@@ -147,7 +147,7 @@ for (n in 1:ul) {
 
 # Verification
 
-The function below verifies the recurrence \@ref(eq:recursive) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding the maximum number of times *any* letter of the word occurs.  The cumulative sum over the distribution of the maximum number $x$ of occurrences gives the number of words having at least one letter appearing $x$ or more times.
+The function below verifies the recurrence \@ref(eq:recursive) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding the maximum number of times *any* letter of the word occurs.&nbsp;  The cumulative sum over the distribution of the maximum number $x$ of occurrences gives the number of words having at least one letter appearing $x$ or more times.
 
 ```{r}
 f <- function(n,k) {
@@ -161,7 +161,7 @@ ul <- 6
 print(lapply(lapply(seq(1,ul),function(X) lapply(seq(1,ul), function(Y) f(X,Y))),function(Z) do.call(cbind,Z)))
 ```
 
-The function below verifies the recurrence \@ref(eq:recursiverev) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding $n+1$ less the minimum number of times any letter of the word occurs.&nbsp; The cumulative sum over this value gives the number of words having at most $1,\ldots,n$ copies of some letter.
+The function below verifies the recurrence \@ref(eq:recursiverev) by formulating all $n$-letter words of the set $\left\{1,\ldots,k\right\}$, and finding $n+1$ less the minimum number of times any letter of the word occurs.&nbsp; The cumulative sum over this value gives the number of words having at most $1,\ldots,n$ copies of some letter.&nbsp; N.b., the rows of each table start at $x=0$.
 
 ```{r}
 g <- function(n,k) {
