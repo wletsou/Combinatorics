@@ -2,7 +2,7 @@
 
 These scripts all use the `vpa` plugin for arbitrary increased integer precision.
 
-`adjaceny_graph(n)' generates the connected components of the graph of the reversible actions in each $n$-network (Figure 2).
+`adjaceny_graph(n)` generates the connected components of the graph of the reversible actions in each $n$-network (Figure 2).
 `connected_states(n)` computes the total number of allowed 1-colorings in each $n$-network (Eq. 1).
 `connected_states(n)` computes the total number of allowed 1-colorings which are *new* (Section V).
 `count_origins(n)` computes the total number of 1-to-$n$-colorings which are reversible to no actions (Table I).
